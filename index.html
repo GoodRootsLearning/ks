@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Spelling Practice: Vowels</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
+<style>
+/* General Kid-Friendly Styling */
+body {
+    margin: 0;
+    background-color: #e1f5fe; /* Light blue background */
+    font-family: 'Coming Soon', cursive; /* Fun, handwritten-style font */
+    color: #333;
+    padding: 20px;
+    text-align: center; /* Center block elements like h1, h2, and the pool */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: #4a148c; /* Deep purple */
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #01579b; /* Dark blue */
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+/* Container for the pool of draggable vowels */
+.draggable-pool {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; /* Space between vowel circles */
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff8e1; /* Light yellow background */
+    border-radius: 12px; /* More rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 500px; /* Limit pool width */
+    width: 90%;
+}
+
+/* Styling for the draggable vowel elements */
+.draggable {
+    width: 60px; /* Make circles larger */
+    height: 60px; /* Make circles larger */
+    background-color: #ffab91; /* Light orange/pink */
+    color: #d84315; /* Dark orange text */
+    text-align: center;
+    font-size: 2.5em; /* Larger font for letters */
+    font-weight: bold;
+    border-radius: 50%; /* Make them circles */
+    cursor: grab;
+    display: inline-flex; /* Use inline-flex to center letter */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.draggable:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.draggable.dragging {
+    opacity: 0.5;
+    transform: scale(0.9);
+}
+
+/* Container for the list of word-image pairs */
+.word-list {
+    max-width: 600px; /* Limit word list width */
+    width: 90%;
+    margin: 0 auto 30px auto; /* Center the block and add bottom margin */
+    text-align: left; /* Align contents of this block to the left */
+}
+
+/* Container for each word-image pair */
+.word-item {
+    display: flex; /* Arrange children (p and img) side-by-side */
+    align-items: center; /* Vertically align items in the center */
+    margin-bottom: 20px; /* Space between each word-image pair */
+    padding: 10px; /* Add some padding around the pair */
+    background-color: #ffffff; /* White background for clarity */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.word-item p {
+    font-size: 3em; /* Large font for words */
+    margin: 0; /* Remove default paragraph margin */
+    padding-right: 15px; /* Space between word and image */
+    /* display: inline-block; Removed as flex handles layout */
+}
+
+.word-item img {
+    width: 100px; /* Set image width */
+    height: 100px; /* Set image height */
+    border-radius: 8px; /* Slightly rounded corners for images */
+    object-fit: cover; /* Ensure image covers the area without distortion */
+    flex-shrink: 0; /* Prevent image from shrinking */
+}
+
+/* Styling for the drop zones (blanks in words) */
+.dropzone {
+    display: inline-block; /* Keep dropzone within text flow */
+    vertical-align: middle; /* Align with text */
+    background-color: #e3f2fd; /* Very light blue */
+    border: 2px dashed #64b5f6; /* Light blue dashed border */
+    width: 1.2em; /* Width based on font size */
+    height: 1.4em; /* Height based on font size */
+    min-width: 45px; /* Minimum touch size */
+    min-height: 50px; /* Minimum touch size */
+    margin: 0 5px; /* Space around the blank */
+    border-radius: 4px;
+    display: inline-flex; /* Use inline-flex for centering dropped item */
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    transition: background-color 0.3s, border-color 0.3s;
+    overflow: hidden; /* Hide overflowing dropped draggable */
+}
+
+.dropzone.draggingover {
+    border-color: #ffab91; /* Highlight with a kid-friendly color */
+    background-color: #ffebee; /* Very light red */
+}
+
+/* Style for dropped vowel inside dropzone */
+.dropzone .draggable {
+    width: 100%; /* Make dropped item fill dropzone */
+    height: 100%; /* Make dropped item fill dropzone */
+    margin: 0; /* Remove margin */
+    border-radius: 0; /* Make it square inside the blank */
+    font-size: 1em; /* Fit font inside */
+    color: #333; /* Darker text color inside blank */
+    background-color: transparent; /* Transparent background for dropped vowel */
+    box-shadow: none; /* Remove shadow on dropped item */
+    cursor: default; /* No grabbing cursor when dropped */
+    pointer-events: none; /* Prevent clicking/dragging the dropped item */
+    display: flex; /* Use flex for centering */
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Correct/Incorrect feedback styles */
+.dropzone.correct {
+    background-color: #c8e6c9; /* Light green */
+    border-color: #388e3c; /* Darker green */
+}
+
+.dropzone.incorrect {
+    background-color: #ffcdd2; /* Light red */
+    border-color: #d32f2f; /* Darker red */
+}
+
+/* Reset button styling */
+#reset-button {
+    padding: 12px 25px; /* Increased padding */
+    font-size: 1.3em; /* Increased font size */
+    background-color: #a5d6a7; /* Light green button */
+    color: #1b5e20; /* Dark green text */
+    border: none;
+    border-radius: 8px; /* More rounded corners */
+    cursor: pointer;
+    margin-top: 30px; /* More space above button */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#reset-button:hover {
+    background-color: #81c784; /* Slightly darker green on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+</style>
+</head>
+<body>
+
+<h1>Spell the Words</h1>
+<h2>Drag the correct vowel to complete each word!</h2>
+
+<div class="draggable-pool">
+  <div class="draggable" draggable="true">a</div>
+  <div class="draggable" draggable="true">e</div>
+  <div class="draggable" draggable="true">i</div>
+  <div class="draggable" draggable="true">o</div>
+  <div class="draggable" draggable="true">u</div>
+</div>
+
+<div class="word-list">
+    <div class="word-item">
+        <p>c <span class="dropzone" data-correct="o"></span> w</p>
+        <img src="/imgs/cow.jpg/?text=Cow" alt="Image of a Cow">
+    </div>
+
+    <div class="word-item">
+        <p>c <span class="dropzone" data-correct="a"></span> t</p>
+        <img src="/imgs/cat.jpg/?text=Cat" alt="Image of a Cat">
+    </div>
+
+    <div class="word-item">
+        <p>k <span class="dropzone" data-correct="e"></span> y</p>
+        <img src="/imgs/Key.jpg/?text=Key" alt="Image of a Key">
+    </div>
+
+    <div class="word-item">
+        <p>b <span class="dropzone" data-correct="u"></span> s</p>
+        <img src="/imgs/bus.jpg/?text=Bus" alt="Image of a Bus">
+    </div>
+
+    <div class="word-item">
+        <p>p <span class="dropzone" data-correct="i"></span> t</p>
+        <img src="/imgs/pit.jpg/?text=Pit" alt="Image of a Pit">
+    </div>
+</div>
+
+<button id="reset-button">Try Again!</button>
+
+
+<script>
+// JavaScript for Simple Drag and Drop Spelling
+
+const draggables = document.querySelectorAll('.draggable-pool .draggable'); // Select draggables from the pool
+const dropzones = document.querySelectorAll('.word-list .dropzone'); // Select dropzones in the word list
+const resetButton = document.getElementById('reset-button');
+
+// --- Drag and Drop Logic ---
+draggables.forEach(draggable => {
+    draggable.addEventListener('dragstart', (e) => {
+        // Store the ID or text of the dragged element
+        e.dataTransfer.setData('text/plain', e.target.textContent.trim());
+        e.target.classList.add('dragging');
+        // Use a timeout to allow the drag image to be created before hiding
+        setTimeout(() => {
+            e.target.style.visibility = 'hidden';
+        }, 0);
+    });
+
+    draggable.addEventListener('dragend', (e) => {
+         // Make all draggables in the pool visible again if they haven't been dropped
+         // Or if using display: none, this might not be needed
+        e.target.classList.remove('dragging');
+         // If display was set to none on drop, ensure it stays hidden
+         if (e.target.parentElement && e.target.parentElement.classList.contains('draggable-pool')) {
+             e.target.style.visibility = 'visible'; // Show if dragged back to pool area or not dropped
+         }
+    });
+});
+
+dropzones.forEach(dropzone => {
+    dropzone.addEventListener('dragover', e => {
+        e.preventDefault(); // Allow drop
+        dropzone.classList.add('draggingover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('draggingover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('draggingover');
+
+        const draggedElement = document.querySelector('.draggable.dragging'); // Get the currently dragged element
+
+        // If the dropzone already has a child, remove it and return the original to the pool
+        if (dropzone.children.length > 0) {
+            const existingItem = dropzone.children[0];
+            const pool = document.querySelector('.draggable-pool');
+
+            // Find the original element in the pool that matches the text of the item being replaced
+            const originalItemInPool = Array.from(draggables).find(drag => drag.textContent.trim() === existingItem.textContent.trim() && drag.style.display === 'none');
+
+            if (originalItemInPool) {
+                 originalItemInPool.style.display = 'inline-flex'; // Make original in pool visible again
+                 originalItemInPool.draggable = true; // Make it draggable again
+                 originalItemInPool.style.cursor = 'grab'; // Restore grab cursor
+                 originalItemInPool.style.visibility = 'visible'; // Ensure visibility
+            }
+             dropzone.removeChild(existingItem); // Remove the old one from the dropzone
+             dropzone.classList.remove('correct', 'incorrect'); // Remove old feedback classes
+        }
+
+
+        if (draggedElement) {
+            // Clone the dragged element for dropping
+            const droppedElement = draggedElement.cloneNode(true);
+
+            // Remove dragging class from the clone
+            droppedElement.classList.remove('dragging');
+             // Ensure clone is visible and has correct display style
+            droppedElement.style.visibility = 'visible';
+            droppedElement.style.display = 'flex'; // Set to flex to center content inside dropzone
+
+            // Append the cloned element to the dropzone
+            dropzone.appendChild(droppedElement);
+
+            // Hide the original element from the pool
+            draggedElement.style.display = 'none';
+
+
+            // Get the correct answer from the dropzone's data attribute
+            const dropzoneCorrectAnswer = dropzone.dataset.correct;
+            // Get the text content from the dropped element
+            const droppedValue = droppedElement.textContent.trim();
+
+            // Check if the dropped value is correct
+            if (droppedValue === dropzoneCorrectAnswer) {
+                dropzone.classList.add('correct');
+                dropzone.classList.remove('incorrect');
+            } else {
+                dropzone.classList.add('incorrect');
+                dropzone.classList.remove('correct');
+            }
+
+            // Disable dragging and pointer events for the dropped element clone
+            droppedElement.draggable = false;
+            droppedElement.style.cursor = 'default';
+            droppedElement.style.pointerEvents = 'none'; // Prevent clicking/dragging the dropped item
+        }
+
+         // Ensure the original dragged element (if it wasn't successfully dropped) is visible.
+         // This might happen if dropped outside a valid zone or logic error.
+         // The dragend listener handles most cases, but a check here can be a fallback.
+         const allDraggables = document.querySelectorAll('.draggable-pool .draggable');
+         allDraggables.forEach(drag => {
+              if (drag.classList.contains('dragging') && drag.style.visibility === 'hidden') {
+                  drag.style.visibility = 'visible';
+                  drag.classList.remove('dragging'); // Clear dragging class
+              }
+         });
+    });
+});
+
+// --- Reset Logic ---
+resetButton.addEventListener('click', resetQuiz);
+
+function resetQuiz() {
+    // Clear all dropzones and return items to pool
+    dropzones.forEach(dropzone => {
+        if (dropzone.children.length > 0) {
+             const existingItem = dropzone.children[0];
+             const pool = document.querySelector('.draggable-pool');
+
+            // Find the original element in the pool
+             const originalItemInPool = Array.from(draggables).find(drag => drag.textContent.trim() === existingItem.textContent.trim());
+
+             if (originalItemInPool) {
+                originalItemInPool.style.display = 'inline-flex'; // Restore display
+                originalItemInPool.style.visibility = 'visible'; // Ensure visibility
+                originalItemInPool.draggable = true;
+                originalItemInPool.style.cursor = 'grab';
+             }
+
+            dropzone.removeChild(existingItem); // Remove the old one from the dropzone
+        }
+        dropzone.classList.remove('correct', 'incorrect'); // Remove feedback classes
+    });
+
+    // Ensure all original draggables in the pool are visible and draggable
+    draggables.forEach(draggable => {
+        draggable.style.display = 'inline-flex'; // Restore display
+        draggable.style.visibility = 'visible'; // Ensure visibility
+        draggable.draggable = true;
+        draggable.style.cursor = 'grab';
+        draggable.classList.remove('dragging'); // Ensure dragging class is off
+    });
+
+    console.log("Quiz reset.");
+}
+
+</script>
+
+</body>
+</html>
