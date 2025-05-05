@@ -347,271 +347,422 @@
             transform: translateY(2px);
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
+        #main-menu {
+            display: none; /* Initially hidden, shown by JS */
+            padding-top: 40px;
+            text-align: center;
+        }
+
+        #game-view {
+            display: none; /* Initially hidden, shown by JS */
+            width: 100%; /* Ensure it takes width */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #level-selection {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px; /* Space between buttons */
+            max-width: 700px; /* Limit width */
+            margin: 30px auto;
+        }
+
+        .level-button {
+            padding: 15px 25px;
+            font-size: 1.5em;
+            font-family: 'Coming Soon', cursive;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            min-width: 150px; /* Ensure buttons have some width */
+            text-align: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .level-button.unlocked {
+            background-color: #a5d6a7; /* Light green */
+            color: #1b5e20; /* Dark green text */
+        }
+        .level-button.unlocked:hover {
+            background-color: #81c784;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0,0,0,0.2);
+        }
+         .level-button.unlocked:active {
+             transform: translateY(1px);
+             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+         }
+
+
+        .level-button.locked {
+            background-color: #e0e0e0; /* Grey */
+            color: #9e9e9e;  /* Darker grey text */
+            cursor: not-allowed; /* Indicate non-interactive */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); /* Inset shadow for locked feel */
+            /* Optionally add a padlock icon using ::before or background-image */
+        }
+        /* Optional Padlock Icon (requires Font Awesome or similar, or an SVG/Image) */
+        /* .level-button.locked::before {
+            content: '\f023'; // Example Font Awesome padlock unicode
+            font-family: 'Font Awesome 5 Free'; // Ensure font is linked
+            font-weight: 900;
+            margin-right: 8px;
+        } */
+
+
+        #back-to-menu-button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            background-color: #ffcc80; /* Light orange */
+            color: #e65100; /* Dark orange */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px; /* Space below it */
+            transition: background-color 0.2s ease;
+        }
+         #back-to-menu-button:hover {
+            background-color: #ffb74d; /* Darker orange */
+         }
 
     </style>
 </head>
 
 <body>
+ <div id="main-menu">
+        <h1>Select a Level</h1>
+        <div id="level-selection">
+            </div>
+    </div>
 
-    <h1>Level <span id="level-display">1</span></h1>
-    <h2>Drag the correct letter(s) to complete each word!</h2>
+    <div id="game-view">
+        <button id="back-to-menu-button">Back to Menu</button> <h1>Level <span id="level-display">1</span></h1>
+        <h2>Drag the correct letter(s) to complete each word!</h2>
 
-    <div id="score-container">Score: 0</div>
+        <div id="score-container">Score: 0</div>
 
-    <div class="draggable-pool">
-        </div>
+        <div class="draggable-pool">
+            </div>
 
-    <div class="word-list">
-        </div>
+        <div class="word-list">
+            </div>
 
-    <button id="reset-button">Try Again!</button>
+        <button id="reset-button">Try Again!</button>
 
-    <div id="level-complete-overlay">
+       </div> <div id="level-complete-overlay">
         <span id="celebration-animation" role="img" aria-label="Party Popper">🎉</span>
         <h2 id="level-complete-message">Level Complete!</h2>
-        <button id="next-level-button">Next Level</button>
+        <button id="overlay-action-button">Back to Menu</button>
     </div>
 
 
     <script>
-        let currentLevelIndex = 0; // Use index for levels array
-        const levels = [
-            { // Level 1 data (index 0)
-                words: [
-                    { wordParts: ["c ", " w"], correct: "o", image: "imgs/cow.jpg", alt: "Image of a Cow" },
-                    { wordParts: ["c ", " t"], correct: "a", image: "imgs/cat.jpg", alt: "Image of a Cat" },
-                    { wordParts: ["k ", " y"], correct: "e", image: "imgs/Key.jpg", alt: "Image of a Key" },
-                    { wordParts: ["b ", " s"], correct: "u", image: "imgs/bus.jpg", alt: "Image of a Bus" },
-                    { wordParts: ["p ", " t"], correct: "i", image: "imgs/pit.jpg", alt: "Image of a Pit" }
-                ],
-                draggables: ["a", "e", "i", "o", "u"]
-            },
-            { // Level 2 data (index 1)
-                words: [
-                    { wordParts: ["f ", " sh"], correct: "i", image: "imgs/fish.jpg", alt: "Image of a Fish" },
-                    { wordParts: ["tr ", ""], correct: "ee", image: "imgs/tree.jpg", alt: "Image of a Tree" }, // Adjusted wordParts
-                    { wordParts: ["b ", " t"], correct: "oa", image: "imgs/boat.jpg", alt: "Image of a Boat" },
-                    { wordParts: ["s ", " n"], correct: "u", image: "imgs/sun.jpg", alt: "Image of a Sun"}, // Changed target 'un' to 'u', assuming simple vowel sounds first
-                    { wordParts: ["c ", " r"], correct: "a", image: "imgs/car.jpg", alt: "Image of a Car" }  // Changed target 'ar' to 'a'
-                ],
-                // Adjusted draggables to match simple vowels and digraphs needed
-                draggables: ["a", "e", "i", "o", "u", "ee", "oa"]
-            },
-             { // Level 3 data (index 2) - Example
-                words: [
-                    { wordParts: ["sh ", " p"], correct: "ee", image: "imgs/sheep.jpg", alt: "Image of a Sheep" },
-                    { wordParts: ["ch ", " r"], correct: "ai", image: "imgs/chair.jpg", alt: "Image of a Chair" },
-                    { wordParts: ["h ", " se"], correct: "ou", image: "imgs/house.jpg", alt: "Image of a House" },
-                    { wordParts: ["cl ", " d"], correct: "ou", image: "imgs/cloud.jpg", alt: "Image of a Cloud" },
-                    { wordParts: ["m ", " n"], correct: "oo", image: "imgs/moon.jpg", alt: "Image of a Moon" }
-                ],
-                draggables: ["a", "e", "i", "o", "u", "ee", "ai", "ou", "oo"]
-            }
-            // Add more levels here following the same structure
-        ];
+    // --- State Variables & Constants ---
+    let currentLevelIndex = 0;
+    const levels = [
+        // Assume at least Level 1, 2, 3 data exists as before
+        { /* Level 1 */ words: [ { wordParts: ["c ", " w"], correct: "o", image: "imgs/cow.jpg", alt: "Image of a Cow" },{ wordParts: ["c ", " t"], correct: "a", image: "imgs/cat.jpg", alt: "Image of a Cat" },{ wordParts: ["k ", " y"], correct: "e", image: "imgs/Key.jpg", alt: "Image of a Key" },{ wordParts: ["b ", " s"], correct: "u", image: "imgs/bus.jpg", alt: "Image of a Bus" },{ wordParts: ["p ", " t"], correct: "i", image: "imgs/pit.jpg", alt: "Image of a Pit" } ], draggables: ["a", "e", "i", "o", "u"] },
+        { /* Level 2 */ words: [ { wordParts: ["f ", " sh"], correct: "i", image: "imgs/fish.jpg", alt: "Image of a Fish" },{ wordParts: ["tr ", ""], correct: "ee", image: "imgs/tree.jpg", alt: "Image of a Tree" },{ wordParts: ["b ", " t"], correct: "oa", image: "imgs/boat.jpg", alt: "Image of a Boat" },{ wordParts: ["s ", " n"], correct: "u", image: "imgs/sun.jpg", alt: "Image of a Sun"},{ wordParts: ["c ", " r"], correct: "a", image: "imgs/car.jpg", alt: "Image of a Car" } ], draggables: ["a", "e", "i", "o", "u", "ee", "oa"] },
+        { /* Level 3 */ words: [ { wordParts: ["sh ", " p"], correct: "ee", image: "imgs/sheep.jpg", alt: "Image of a Sheep" },{ wordParts: ["ch ", " r"], correct: "ai", image: "imgs/chair.jpg", alt: "Image of a Chair" },{ wordParts: ["h ", " se"], correct: "ou", image: "imgs/house.jpg", alt: "Image of a House" },{ wordParts: ["cl ", " d"], correct: "ou", image: "imgs/cloud.jpg", alt: "Image of a Cloud" },{ wordParts: ["m ", " n"], correct: "oo", image: "imgs/moon.jpg", alt: "Image of a Moon" } ], draggables: ["a", "e", "i", "o", "u", "ee", "ai", "ou", "oo"] }
+        // Add data for levels 4-10 here if you want 10 levels
+    ];
+    let totalScore = 0;
+    let correctAnswersInLevel = 0;
+    let draggedItem = null;
 
-        let totalScore = 0; // Keep track of score across levels
-        let correctAnswersInLevel = 0;
-        let draggedItem = null; // Variable to store the element being dragged
+    // --- Local Storage Key ---
+    const localStorageKey = "spellingGameHighestLevelUnlocked";
 
-        const draggablesContainer = document.querySelector('.draggable-pool');
-        const wordListContainer = document.querySelector('.word-list');
-        const resetButton = document.getElementById('reset-button');
-        const scoreContainer = document.getElementById('score-container');
-        const levelCompleteOverlay = document.getElementById('level-complete-overlay');
-        const nextLevelButton = document.getElementById('next-level-button');
-        const levelDisplay = document.getElementById('level-display');
-        const levelCompleteMessage = document.getElementById('level-complete-message');
+    // --- DOM Element References ---
+    let draggablesContainer;
+    let wordListContainer;
+    let resetButton;
+    let scoreContainer;
+    let levelCompleteOverlay;
+    let levelDisplay;
+    let levelCompleteMessage;
+    let overlayActionButton; // Renamed from nextLevelButton for clarity
+    let mainMenuDiv;
+    let gameViewDiv;
+    let levelSelectionContainer;
+    let backToMenuButton;
 
-        // --- Core Functions ---
-
-        function loadLevel(levelIndex) {
-            // Basic check if level exists
-            if (levelIndex < 0 || levelIndex >= levels.length) {
-                console.error("Invalid level index:", levelIndex);
-                // Optionally display a "Game Over" message or loop back
-                displayGameOver();
-                return;
-            }
-
-            currentLevelIndex = levelIndex;
-            const levelData = levels[currentLevelIndex];
-            levelDisplay.textContent = currentLevelIndex + 1; // Display level number (1-based)
-            correctAnswersInLevel = 0; // Reset correct answers for the new level
-            wordListContainer.innerHTML = ''; // Clear previous words
-            draggablesContainer.innerHTML = ''; // Clear previous draggables
-            updateScoreDisplay(); // Update score display (might carry over)
-
-            // Load draggables for the current level
-            levelData.draggables.forEach(itemText => {
-                const draggable = document.createElement('div');
-                draggable.classList.add('draggable');
-                draggable.setAttribute('draggable', 'true');
-                draggable.textContent = itemText;
-                draggablesContainer.appendChild(draggable);
-                addDraggableListeners(draggable); // Attach listeners immediately
-            });
-
-            // Load words for the current level
-            levelData.words.forEach(wordData => {
-                const wordItem = document.createElement('div');
-                wordItem.classList.add('word-item');
-
-                const paragraph = document.createElement('p');
-                // Construct the word with a dropzone
-                paragraph.innerHTML = `${wordData.wordParts[0]}<span class="dropzone" data-correct="${wordData.correct}"></span>${wordData.wordParts[1]}`;
-
-                const image = document.createElement('img');
-                image.src = wordData.image;
-                image.alt = wordData.alt;
-
-                wordItem.appendChild(paragraph);
-                wordItem.appendChild(image);
-                wordListContainer.appendChild(wordItem);
-
-                // Find the newly created dropzone within this wordItem and add listeners
-                const dropzone = wordItem.querySelector('.dropzone');
-                 if (dropzone) { // Ensure dropzone was found
-                    addDropzoneListeners(dropzone);
-                 } else {
-                    console.error("Could not find dropzone for word:", wordData);
-                 }
-            });
-
-             levelCompleteOverlay.style.display = 'none'; // Ensure overlay is hidden
+    // --- Local Storage Functions ---
+    function getHighestLevelUnlocked() {
+        const storedValue = localStorage.getItem(localStorageKey);
+        // Default to 1 if nothing stored or value is invalid
+        let level = parseInt(storedValue || "1");
+        if (isNaN(level) || level < 1) {
+            level = 1;
         }
+        return level;
+    }
 
-        function updateScoreDisplay() {
-            scoreContainer.textContent = `Score: ${totalScore}`;
+    function unlockLevel(levelNumber) {
+        const highestUnlocked = getHighestLevelUnlocked();
+        if (levelNumber > highestUnlocked) {
+            localStorage.setItem(localStorageKey, levelNumber.toString());
+            console.log(`Level ${levelNumber} unlocked!`);
         }
-
-        function checkLevelComplete() {
-            const totalWordsInLevel = levels[currentLevelIndex].words.length;
-            if (correctAnswersInLevel === totalWordsInLevel) {
-                // --- Level Complete! ---
-                levelCompleteMessage.textContent = `🎉 Level ${currentLevelIndex + 1} Complete! 🎉`;
-                levelCompleteOverlay.style.display = 'flex'; // Show the overlay
-
-                // Check if this is the last level
-                if (currentLevelIndex >= levels.length - 1) {
-                    nextLevelButton.textContent = "Play Again?";
-                } else {
-                    nextLevelButton.textContent = "Next Level";
-                }
-            }
-        }
-
-         function displayGameOver() {
-            levelCompleteMessage.innerHTML = `✨ You Finished All Levels! <br> Great Job! ✨`; // Using innerHTML for line break
-            nextLevelButton.textContent = "Play Again?";
-            levelCompleteOverlay.style.display = 'flex'; // Show the overlay
-            // Ensure the index loops back correctly when "Play Again?" is clicked
-            currentLevelIndex = levels.length; // Set index beyond the last level to trigger reset on next click
-         }
+    }
 
 
-        // --- Event Handling ---
+    // --- View Switching Functions ---
+    function showMenuView() {
+        mainMenuDiv.style.display = 'block';
+        gameViewDiv.style.display = 'none';
+        levelCompleteOverlay.style.display = 'none'; // Ensure overlay is hidden
+        generateLevelButtons(); // Regenerate buttons to show current lock status
+    }
 
-        function addDraggableListeners(draggable) {
-            draggable.addEventListener('dragstart', (e) => {
-                draggedItem = draggable; // Store the element itself
-                e.dataTransfer.setData('text/plain', draggable.textContent);
-                e.dataTransfer.effectAllowed = 'move';
-                // Add slight delay for style application
-                setTimeout(() => draggable.classList.add('dragging'), 0);
-            });
+    function showGameView() {
+        mainMenuDiv.style.display = 'none';
+        gameViewDiv.style.display = 'flex'; // Use flex to match body styling potentially
+    }
 
-            draggable.addEventListener('dragend', () => {
-                // Check if draggedItem exists before removing class
-                if(draggedItem) {
-                   draggedItem.classList.remove('dragging');
-                }
-                draggedItem = null; // Clear the reference
-            });
-        }
+    // --- Generate Level Buttons ---
+    function generateLevelButtons() {
+        levelSelectionContainer.innerHTML = ''; // Clear existing buttons
+        const highestUnlocked = getHighestLevelUnlocked();
+        const maxLevelToShow = levels.length; // Only show buttons for defined levels
 
-        function addDropzoneListeners(dropzone) {
-            dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault(); // Necessary to allow dropping
-                e.dataTransfer.dropEffect = 'move';
-                dropzone.classList.add('draggingover');
-            });
+        for (let i = 1; i <= maxLevelToShow; i++) {
+            const button = document.createElement('button');
+            button.textContent = `Level ${i}`;
+            button.classList.add('level-button');
+            button.dataset.level = i; // Store level number (1-based)
 
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('draggingover');
-            });
-
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('draggingover');
-
-                // Prevent dropping if already filled or if no item was dragged
-                if (dropzone.children.length > 0 || !draggedItem) return;
-
-                const droppedLetter = e.dataTransfer.getData('text/plain');
-                const correctAnswer = dropzone.dataset.correct;
-
-                // Create visual representation of the dropped item
-                const droppedItemDisplay = document.createElement('div');
-                droppedItemDisplay.classList.add('dropped-item');
-                droppedItemDisplay.textContent = droppedLetter;
-                dropzone.appendChild(droppedItemDisplay); // Add visual inside dropzone
-
-                // Check Answer
-                if (droppedLetter === correctAnswer) {
-                    dropzone.classList.add('correct');
-                    dropzone.classList.remove('incorrect'); // Remove incorrect if it was there
-                    totalScore++;
-                    correctAnswersInLevel++;
-                    updateScoreDisplay();
-                    // Make the original draggable item visually unavailable (optional)
-                    // draggedItem.style.opacity = '0.3';
-                    // draggedItem.setAttribute('draggable', 'false');
-                    // Note: Re-enabling on reset would be needed if doing this
-
-                    checkLevelComplete(); // Check if level is finished
-                } else {
-                    dropzone.classList.add('incorrect');
-                    // Remove the incorrect visual feedback and the wrongly dropped item after a delay
-                    setTimeout(() => {
-                        dropzone.classList.remove('incorrect');
-                        dropzone.removeChild(droppedItemDisplay); // Remove the incorrect letter display
-                    }, 800); // Keep feedback visible for a bit longer
-                }
-                draggedItem = null; // Clear reference after drop attempt
-            });
-        }
-
-        // --- Button Listeners ---
-
-        resetButton.addEventListener('click', () => {
-            // Reload the *current* level, potentially resetting score for this level if desired
-            // For now, it just reloads the visuals and keeps the totalScore
-            console.log("Resetting level:", currentLevelIndex);
-             // Simple approach: Deduct points earned in this level before reload
-             // Find how many points were scored in this attempt (more complex logic needed if score isn't just +1 per correct)
-             // Let's just reload the level visuals for simplicity now.
-            loadLevel(currentLevelIndex);
-        });
-
-        nextLevelButton.addEventListener('click', () => {
-            if (nextLevelButton.textContent === "Play Again?") {
-                 totalScore = 0; // Reset score completely
-                 loadLevel(0); // Go back to level 1 (index 0)
+            if (i <= highestUnlocked) {
+                button.classList.add('unlocked');
+                button.disabled = false;
+                button.addEventListener('click', () => {
+                    // Level index is level number - 1
+                    const levelIndex = parseInt(button.dataset.level) - 1;
+                    if (levelIndex >= 0 && levelIndex < levels.length) {
+                            currentLevelIndex = levelIndex; // Set the current level
+                            totalScore = 0; // Reset score when starting a new level from menu
+                            showGameView();
+                            loadLevel(levelIndex);
+                    } else {
+                        console.error("Invalid level index selected:", levelIndex);
+                    }
+                });
             } else {
-                 loadLevel(currentLevelIndex + 1); // Load the next level
+                button.classList.add('locked');
+                button.disabled = true;
             }
+            levelSelectionContainer.appendChild(button);
+        }
+    }
 
-            levelCompleteOverlay.style.display = 'none'; // Hide overlay
+
+    // --- Core Gameplay Functions ---
+
+    function loadLevel(levelIndex) {
+            if (levelIndex < 0 || levelIndex >= levels.length) {
+            console.error("Attempted to load invalid level index:", levelIndex);
+                // Maybe default to menu? Or show an error?
+                showMenuView(); // Go back to menu if level doesn't exist
+                return;
+        }
+
+        currentLevelIndex = levelIndex; // Make sure this is set
+        const levelData = levels[currentLevelIndex];
+        levelDisplay.textContent = currentLevelIndex + 1;
+        correctAnswersInLevel = 0;
+        wordListContainer.innerHTML = '';
+        draggablesContainer.innerHTML = '';
+        updateScoreDisplay(); // Update score display (reset to 0 when called from menu)
+
+        // Load draggables
+        levelData.draggables.forEach(itemText => {
+            const draggable = document.createElement('div');
+            draggable.classList.add('draggable');
+            draggable.setAttribute('draggable', 'true');
+            draggable.textContent = itemText;
+            draggablesContainer.appendChild(draggable);
+            // Note: Listeners added after loop finishes
         });
 
+        // Load words
+        levelData.words.forEach(wordData => {
+            const wordItem = document.createElement('div');
+            wordItem.classList.add('word-item');
 
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', () => {
-             loadLevel(currentLevelIndex); // Load the first level (index 0)
+            const paragraph = document.createElement('p');
+            paragraph.innerHTML = `${wordData.wordParts[0]}<span class="dropzone" data-correct="${wordData.correct}"></span>${wordData.wordParts[1]}`;
+
+            const image = document.createElement('img');
+            image.src = wordData.image;
+            image.alt = wordData.alt;
+
+            wordItem.appendChild(paragraph);
+            wordItem.appendChild(image);
+            wordListContainer.appendChild(wordItem);
+            // Note: Listeners added after loop finishes
         });
 
-    </script>
+        // Add listeners to all newly created elements
+        document.querySelectorAll('.draggable').forEach(addDraggableListeners);
+        document.querySelectorAll('.dropzone').forEach(addDropzoneListeners);
+    }
+
+
+    function updateScoreDisplay() {
+        scoreContainer.textContent = `Score: ${totalScore}`;
+    }
+
+    function checkLevelComplete() {
+        const totalWordsInLevel = levels[currentLevelIndex].words.length;
+        if (correctAnswersInLevel === totalWordsInLevel) {
+            // --- Level Complete! ---
+
+            // 1. Unlock the *next* level (level number = index + 1, so next is index + 2)
+            const nextLevelNumber = currentLevelIndex + 2;
+            unlockLevel(nextLevelNumber);
+
+            // 2. Show Overlay
+            levelCompleteMessage.textContent = `🎉 Level ${currentLevelIndex + 1} Complete! 🎉`;
+                // Ensure button text is correct (might have been changed by game over)
+                overlayActionButton.textContent = "Back to Menu";
+            levelCompleteOverlay.style.display = 'flex';
+        }
+    }
+
+    function displayGameOver() {
+        // Called when trying to load a level beyond the existing ones
+        levelCompleteMessage.innerHTML = `✨ You Finished All Available Levels! <br> Great Job! ✨`;
+        overlayActionButton.textContent = "Back to Menu"; // Keep consistent
+        levelCompleteOverlay.style.display = 'flex';
+    }
+
+
+    // --- Event Handling Setup ---
+
+    function addDraggableListeners(draggable) {
+        draggable.addEventListener('dragstart', (e) => {
+            draggedItem = draggable; // Store the element itself
+            e.dataTransfer.setData('text/plain', draggable.textContent);
+            e.dataTransfer.effectAllowed = 'move';
+            // Add slight delay for style application
+            setTimeout(() => draggable.classList.add('dragging'), 0);
+        });
+
+        draggable.addEventListener('dragend', () => {
+            // Check if draggedItem exists before removing class
+            if(draggedItem) {
+                draggedItem.classList.remove('dragging');
+            }
+            draggedItem = null; // Clear the reference
+        });
+    }
+
+    function addDropzoneListeners(dropzone) {
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Necessary to allow dropping
+            e.dataTransfer.dropEffect = 'move';
+            dropzone.classList.add('draggingover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('draggingover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('draggingover');
+
+            // Prevent dropping if already filled or if no item was dragged
+            if (dropzone.children.length > 0 || !draggedItem) return;
+
+            const droppedLetter = e.dataTransfer.getData('text/plain');
+            const correctAnswer = dropzone.dataset.correct;
+
+            // Create visual representation of the dropped item
+            const droppedItemDisplay = document.createElement('div');
+            droppedItemDisplay.classList.add('dropped-item');
+            droppedItemDisplay.textContent = droppedLetter;
+            dropzone.appendChild(droppedItemDisplay); // Add visual inside dropzone
+
+            // Check Answer
+            if (droppedLetter === correctAnswer) {
+                dropzone.classList.add('correct');
+                dropzone.classList.remove('incorrect'); // Remove incorrect if it was there
+                totalScore++;
+                correctAnswersInLevel++;
+                updateScoreDisplay();
+                // Make the original draggable item visually unavailable (optional)
+                // draggedItem.style.opacity = '0.3';
+                // draggedItem.setAttribute('draggable', 'false');
+                // Note: Re-enabling on reset would be needed if doing this
+
+                checkLevelComplete(); // Check if level is finished
+            } else {
+                dropzone.classList.add('incorrect');
+                // Remove the incorrect visual feedback and the wrongly dropped item after a delay
+                setTimeout(() => {
+                    dropzone.classList.remove('incorrect');
+                    // Check if the appended child is still the one we added before removing
+                    if (dropzone.lastChild === droppedItemDisplay) {
+                            dropzone.removeChild(droppedItemDisplay);
+                    }
+                }, 500); // Use the shorter delay
+            }
+            draggedItem = null; // Clear reference after drop attempt
+        });
+    }
+
+    function initializeElements() {
+        // Gameplay elements
+        draggablesContainer = document.querySelector('.draggable-pool');
+        wordListContainer = document.querySelector('.word-list');
+        resetButton = document.getElementById('reset-button');
+        scoreContainer = document.getElementById('score-container');
+        levelCompleteOverlay = document.getElementById('level-complete-overlay');
+        levelDisplay = document.getElementById('level-display');
+        levelCompleteMessage = document.getElementById('level-complete-message');
+        overlayActionButton = document.getElementById('overlay-action-button');
+
+        // Menu/View elements
+        mainMenuDiv = document.getElementById('main-menu');
+        gameViewDiv = document.getElementById('game-view');
+        levelSelectionContainer = document.getElementById('level-selection');
+        backToMenuButton = document.getElementById('back-to-menu-button');
+    }
+
+    function setupButtonListeners() {
+        // Reset button (resets current level)
+        resetButton.addEventListener('click', () => {
+            // Only load if game view is active (safety check)
+            if (gameViewDiv.style.display !== 'none') {
+                 loadLevel(currentLevelIndex);
+            }
+        });
+
+        // Overlay button (now always goes back to menu)
+        overlayActionButton.addEventListener('click', () => {
+                showMenuView(); // Go back to menu after level complete or game over
+        });
+
+        // Back to Menu button (in game view)
+        backToMenuButton.addEventListener('click', () => {
+            showMenuView();
+        });
+    }
+
+
+    // --- Initial Load ---
+    document.addEventListener('DOMContentLoaded', () => {
+            initializeElements(); // Get element references
+            setupButtonListeners(); // Set up static button clicks
+            showMenuView();       // Show the main menu initially
+    });
+
+</script>
 
 </body>
 
