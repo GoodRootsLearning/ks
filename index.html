@@ -1,386 +1,618 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Spelling Practice: Vowels</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
-<style>
-/* General Kid-Friendly Styling */
-body {
-    margin: 0;
-    background-color: #e1f5fe; /* Light blue background */
-    font-family: 'Coming Soon', cursive; /* Fun, handwritten-style font */
-    color: #333;
-    padding: 20px;
-    text-align: center; /* Center block elements like h1, h2, and the pool */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+    <title>Spelling Practice</title> <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
+    <style>
+        /* General Kid-Friendly Styling */
+        body {
+            margin: 0;
+            background-color: #e1f5fe;
+            /* Light blue background */
+            font-family: 'Coming Soon', cursive;
+            /* Fun, handwritten-style font */
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            /* Center block elements like h1, h2, and the pool */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh; /* Ensure body takes full height */
+            box-sizing: border-box;
+        }
 
-h1 {
-    color: #4a148c; /* Deep purple */
-    font-size: 2.5em;
-    margin-bottom: 10px;
-}
+        h1 {
+            color: #4a148c;
+            /* Deep purple */
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-h2 {
-    color: #01579b; /* Dark blue */
-    font-size: 1.5em;
-    margin-bottom: 20px;
-}
+        h2 {
+            color: #01579b;
+            /* Dark blue */
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
 
-/* Container for the pool of draggable vowels */
-.draggable-pool {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px; /* Space between vowel circles */
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #fff8e1; /* Light yellow background */
-    border-radius: 12px; /* More rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px; /* Limit pool width */
-    width: 90%;
-}
+        /* Container for the pool of draggable vowels */
+        .draggable-pool {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            /* Space between vowel circles */
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff8e1;
+            /* Light yellow background */
+            border-radius: 12px;
+            /* More rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            /* Limit pool width */
+            width: 90%;
+            position: sticky; /* Makes the element stick */
+            top: 10px;        /* Stick 10px from the top edge of the viewport */
+            z-index: 5;       /* Ensure it stays above the word list but below overlays (like level complete) */
 
-/* Styling for the draggable vowel elements */
-.draggable {
-    width: 60px; /* Make circles larger */
-    height: 60px; /* Make circles larger */
-    background-color: #ffab91; /* Light orange/pink */
-    color: #d84315; /* Dark orange text */
-    text-align: center;
-    font-size: 2.5em; /* Larger font for letters */
-    font-weight: bold;
-    border-radius: 50%; /* Make them circles */
-    cursor: grab;
-    display: inline-flex; /* Use inline-flex to center letter */
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+        }
 
-.draggable:active {
-    cursor: grabbing;
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+        /* Styling for the draggable vowel elements */
+        .draggable {
+            width: 60px;
+            /* Make circles larger */
+            height: 60px;
+            /* Make circles larger */
+            background-color: #ffab91;
+            /* Light orange/pink */
+            color: #d84315;
+            /* Dark orange text */
+            text-align: center;
+            font-size: 1.8em; /* Adjusted for potentially longer strings like 'ee' */
+            font-weight: bold;
+            border-radius: 50%;
+            /* Make them circles */
+            cursor: grab;
+            display: inline-flex;
+            /* Use inline-flex to center letter */
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+            user-select: none; /* Prevent text selection during drag */
+             -webkit-user-select: none; /* Safari */
+             -moz-user-select: none; /* Firefox */
+             -ms-user-select: none; /* IE10+ */
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Style applied by JS during drag */
+        .draggable.dragging {
+            opacity: 0.5;
+            transform: scale(0.9);
+            box-shadow: none;
+        }
+
+        /* Container for the list of word-image pairs */
+        .word-list {
+            max-width: 600px;
+            /* Limit word list width */
+            width: 90%;
+            margin: 0 auto 30px auto;
+            /* Center the block and add bottom margin */
+            text-align: left;
+            /* Align contents of this block to the left */
+        }
+
+        /* Container for each word-image pair */
+        .word-item {
+            display: flex;
+            /* Arrange children (p and img) side-by-side */
+            align-items: center;
+            /* Vertically align items in the center */
+            justify-content: space-between; /* Space out text and image */
+            margin-bottom: 20px;
+            /* Space between each word-image pair */
+            padding: 15px; /* Increased padding */
+            background-color: #ffffff;
+            /* White background for clarity */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .word-item p {
+            font-size: 2.8em; /* Slightly smaller to prevent wrap on mobile */
+            margin: 0;
+            /* Remove default paragraph margin */
+            padding-right: 15px;
+            /* Space between word and image */
+            flex-grow: 1; /* Allow text to take available space */
+            line-height: 1.5; /* Ensure dropzone height fits */
+        }
+
+        .word-item img {
+            width: 100px;
+            /* Set image width */
+            height: 100px;
+            /* Set image height */
+            border-radius: 8px;
+            /* Slightly rounded corners for images */
+            object-fit: cover;
+            /* Ensure image covers the area without distortion */
+            flex-shrink: 0;
+            /* Prevent image from shrinking */
+            margin-left: 15px; /* Space between text and image */
+ 	border: 1px solid #bdbdbd; /* Add a subtle border for definition */
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Standard button shadow */
+            cursor: pointer; /* Indicate it 'could' be interactive */
+            transition: transform 0.15s ease, box-shadow 0.15s ease; /* Smooth transitions for hover/active */
+            background-color: #fff; /* Ensure background for images with transparency */
+        }
+         .word-item img:hover {
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3); /* Larger shadow on hover */
+            transform: translateY(-1px); /* Slightly lift the image */
+        }
+
+        .word-item img:active {
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Smaller shadow, looks 'pressed' */
+            transform: translateY(1px); /* Slightly push the image down */
+        }
+
+        /* Styling for the drop zones (blanks in words) */
+        .dropzone {
+            display: inline-block;
+            /* Keep dropzone within text flow */
+            vertical-align: middle;
+            /* Align with text */
+            background-color: #e3f2fd;
+            /* Very light blue */
+            border: 2px dashed #64b5f6;
+            /* Light blue dashed border */
+            width: 1.5em; /* Adjusted width for potential longer letters */
+            height: 1.4em;
+            /* Height based on font size */
+            min-width: 55px;  /* Was 50px */
+            min-height: 55px; /* Was 50px */
+
+            margin: 0 5px;
+            /* Space around the blank */
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s;
+            position: relative; /* Needed for absolute positioning of dropped item */
+            /* Remove inline-flex properties - content added dynamically */
+        }
+
+        .dropzone.draggingover {
+            border-color: #ff7043; /* Brighter orange for highlight */
+            background-color: #fff3e0; /* Light orange background */
+        }
+
+        /* Style for dropped vowel APPEARANCE inside dropzone */
+        .dropped-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em; /* Slightly larger font inside blank */
+            font-weight: bold;
+            color: #333;
+            background-color: transparent; /* Show dropzone feedback color */
+            border-radius: 4px; /* Match dropzone rounding */
+            box-sizing: border-box;
+             user-select: none; /* Prevent text selection */
+             -webkit-user-select: none;
+             -moz-user-select: none;
+             -ms-user-select: none;
+             pointer-events: none; /* Prevents interfering with dropzone events */
+        }
 
 
-.draggable.dragging {
-    opacity: 0.5;
-    transform: scale(0.9);
-}
-
-/* Container for the list of word-image pairs */
-.word-list {
-    max-width: 600px; /* Limit word list width */
-    width: 90%;
-    margin: 0 auto 30px auto; /* Center the block and add bottom margin */
-    text-align: left; /* Align contents of this block to the left */
-}
-
-/* Container for each word-image pair */
-.word-item {
-    display: flex; /* Arrange children (p and img) side-by-side */
-    align-items: center; /* Vertically align items in the center */
-    margin-bottom: 20px; /* Space between each word-image pair */
-    padding: 10px; /* Add some padding around the pair */
-    background-color: #ffffff; /* White background for clarity */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.word-item p {
-    font-size: 3em; /* Large font for words */
-    margin: 0; /* Remove default paragraph margin */
-    padding-right: 15px; /* Space between word and image */
-    /* display: inline-block; Removed as flex handles layout */
-}
-
-.word-item img {
-    width: 100px; /* Set image width */
-    height: 100px; /* Set image height */
-    border-radius: 8px; /* Slightly rounded corners for images */
-    object-fit: cover; /* Ensure image covers the area without distortion */
-    flex-shrink: 0; /* Prevent image from shrinking */
-}
-
-/* Styling for the drop zones (blanks in words) */
-.dropzone {
-    display: inline-block; /* Keep dropzone within text flow */
-    vertical-align: middle; /* Align with text */
-    background-color: #e3f2fd; /* Very light blue */
-    border: 2px dashed #64b5f6; /* Light blue dashed border */
-    width: 1.2em; /* Width based on font size */
-    height: 1.4em; /* Height based on font size */
-    min-width: 45px; /* Minimum touch size */
-    min-height: 50px; /* Minimum touch size */
-    margin: 0 5px; /* Space around the blank */
-    border-radius: 4px;
-    display: inline-flex; /* Use inline-flex for centering dropped item */
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    transition: background-color 0.3s, border-color 0.3s;
-    overflow: hidden; /* Hide overflowing dropped draggable */
-}
-
-.dropzone.draggingover {
-    border-color: #ffab91; /* Highlight with a kid-friendly color */
-    background-color: #ffebee; /* Very light red */
-}
-
-/* Style for dropped vowel inside dropzone */
-.dropzone .draggable {
-    width: 100%; /* Make dropped item fill dropzone */
-    height: 100%; /* Make dropped item fill dropzone */
-    margin: 0; /* Remove margin */
-    border-radius: 0; /* Make it square inside the blank */
-    font-size: 1em; /* Fit font inside */
-    color: #333; /* Darker text color inside blank */
-    background-color: transparent; /* Transparent background for dropped vowel */
-    box-shadow: none; /* Remove shadow on dropped item */
-    cursor: default; /* No grabbing cursor when dropped */
-    pointer-events: none; /* Prevent clicking/dragging the dropped item */
-    display: flex; /* Use flex for centering */
-    align-items: center;
-    justify-content: center;
-}
+        /* Correct/Incorrect feedback styles */
+        .dropzone.correct {
+            background-color: #c8e6c9;
+            /* Light green */
+            border: 2px solid #388e3c; /* Solid border when correct */
+        }
+        .dropzone.correct .dropped-item {
+            color: #1b5e20; /* Dark green text */
+        }
 
 
-/* Correct/Incorrect feedback styles */
-.dropzone.correct {
-    background-color: #c8e6c9; /* Light green */
-    border-color: #388e3c; /* Darker green */
-}
+        .dropzone.incorrect {
+            background-color: #ffcdd2;
+            /* Light red */
+            border: 2px solid #d32f2f; /* Solid border when incorrect */
+            animation: shake 0.5s ease-in-out; /* Add shake animation */
+        }
+        .dropzone.incorrect .dropped-item {
+             color: #b71c1c; /* Dark red text */
+        }
 
-.dropzone.incorrect {
-    background-color: #ffcdd2; /* Light red */
-    border-color: #d32f2f; /* Darker red */
-}
+        /* Shake animation for incorrect drops */
+         @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); } /* Adjust shake intensity/timing if desired */
+            40%, 80% { transform: translateX(4px); }
+        }
 
-/* Reset button styling */
-#reset-button {
-    padding: 12px 25px; /* Increased padding */
-    font-size: 1.3em; /* Increased font size */
-    background-color: #a5d6a7; /* Light green button */
-    color: #1b5e20; /* Dark green text */
-    border: none;
-    border-radius: 8px; /* More rounded corners */
-    cursor: pointer;
-    margin-top: 30px; /* More space above button */
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-#reset-button:hover {
-    background-color: #81c784; /* Slightly darker green on hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
+        /* Reset button styling */
+        #reset-button {
+            padding: 12px 25px;
+            /* Increased padding */
+            font-size: 1.3em;
+            /* Increased font size */
+            background-color: #a5d6a7;
+            /* Light green button */
+            color: #1b5e20;
+            /* Dark green text */
+            border: none;
+            border-radius: 8px;
+            /* More rounded corners */
+            cursor: pointer;
+            margin-top: 30px;
+            /* More space above button */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-</style>
+        #reset-button:hover {
+            background-color: #81c784;
+            /* Slightly darker green on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Score container */
+        #score-container {
+            font-size: 1.5em;
+            color: #2e7d32;
+            /* Darker green for score */
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Level complete overlay */
+        #level-complete-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            /* Semi-transparent white */
+            display: none; /* Initially hidden */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #level-complete-message { /* Changed from h2 */
+            font-size: 2.5em;
+            color: #4a148c;
+            /* Deep purple */
+            margin-bottom: 30px;
+        }
+
+        #celebration-animation {
+             display: block; /* Make it block to center */
+             font-size: 4em; /* Large icon */
+             margin-bottom: 20px;
+             animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+
+        #level-complete-overlay button {
+            padding: 15px 30px;
+            font-size: 1.5em;
+            font-family: 'Coming Soon', cursive; /* Ensure button uses same font */
+            background-color: #fdd835;
+            /* Yellow */
+            color: #424242; /* Dark Grey text */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+        }
+
+        #level-complete-overlay button:hover {
+            background-color: #fbc02d;
+            /* Darker yellow */
+        }
+         #level-complete-overlay button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+    </style>
 </head>
+
 <body>
 
-<h1>Spell the Words</h1>
-<h2>Drag the correct vowel to complete each word!</h2>
+    <h1>Level <span id="level-display">1</span></h1>
+    <h2>Drag the correct letter(s) to complete each word!</h2>
 
-<div class="draggable-pool">
-  <div class="draggable" draggable="true">a</div>
-  <div class="draggable" draggable="true">e</div>
-  <div class="draggable" draggable="true">i</div>
-  <div class="draggable" draggable="true">o</div>
-  <div class="draggable" draggable="true">u</div>
-</div>
+    <div id="score-container">Score: 0</div>
 
-<div class="word-list">
-    <div class="word-item">
-        <p>c <span class="dropzone" data-correct="o"></span> w</p>
-        <img src="imgs/cow.jpg" alt="Image of a Cow">
+    <div class="draggable-pool">
+        </div>
+
+    <div class="word-list">
+        </div>
+
+    <button id="reset-button">Try Again!</button>
+
+    <div id="level-complete-overlay">
+        <span id="celebration-animation" role="img" aria-label="Party Popper">🎉</span>
+        <h2 id="level-complete-message">Level Complete!</h2>
+        <button id="next-level-button">Next Level</button>
     </div>
 
-    <div class="word-item">
-        <p>c <span class="dropzone" data-correct="a"></span> t</p>
-        <img src="imgs/cat.jpg" alt="Image of a Cat">
-    </div>
 
-    <div class="word-item">
-        <p>k <span class="dropzone" data-correct="e"></span> y</p>
-        <img src="imgs/Key.jpg" alt="Image of a Key">
-    </div>
+    <script>
+        let currentLevelIndex = 0; // Use index for levels array
+        const levels = [
+            { // Level 1 data (index 0)
+                words: [
+                    { wordParts: ["c ", " w"], correct: "o", image: "imgs/cow.jpg", alt: "Image of a Cow" },
+                    { wordParts: ["c ", " t"], correct: "a", image: "imgs/cat.jpg", alt: "Image of a Cat" },
+                    { wordParts: ["k ", " y"], correct: "e", image: "imgs/Key.jpg", alt: "Image of a Key" },
+                    { wordParts: ["b ", " s"], correct: "u", image: "imgs/bus.jpg", alt: "Image of a Bus" },
+                    { wordParts: ["p ", " t"], correct: "i", image: "imgs/pit.jpg", alt: "Image of a Pit" }
+                ],
+                draggables: ["a", "e", "i", "o", "u"]
+            },
+            { // Level 2 data (index 1)
+                words: [
+                    { wordParts: ["f ", " sh"], correct: "i", image: "imgs/fish.jpg", alt: "Image of a Fish" },
+                    { wordParts: ["tr ", ""], correct: "ee", image: "imgs/tree.jpg", alt: "Image of a Tree" }, // Adjusted wordParts
+                    { wordParts: ["b ", " t"], correct: "oa", image: "imgs/boat.jpg", alt: "Image of a Boat" },
+                    { wordParts: ["s ", " n"], correct: "u", image: "imgs/sun.jpg", alt: "Image of a Sun"}, // Changed target 'un' to 'u', assuming simple vowel sounds first
+                    { wordParts: ["c ", " r"], correct: "a", image: "imgs/car.jpg", alt: "Image of a Car" }  // Changed target 'ar' to 'a'
+                ],
+                // Adjusted draggables to match simple vowels and digraphs needed
+                draggables: ["a", "e", "i", "o", "u", "ee", "oa"]
+            },
+             { // Level 3 data (index 2) - Example
+                words: [
+                    { wordParts: ["sh ", " p"], correct: "ee", image: "imgs/sheep.jpg", alt: "Image of a Sheep" },
+                    { wordParts: ["ch ", " r"], correct: "ai", image: "imgs/chair.jpg", alt: "Image of a Chair" },
+                    { wordParts: ["h ", " se"], correct: "ou", image: "imgs/house.jpg", alt: "Image of a House" },
+                    { wordParts: ["cl ", " d"], correct: "ou", image: "imgs/cloud.jpg", alt: "Image of a Cloud" },
+                    { wordParts: ["m ", " n"], correct: "oo", image: "imgs/moon.jpg", alt: "Image of a Moon" }
+                ],
+                draggables: ["a", "e", "i", "o", "u", "ee", "ai", "ou", "oo"]
+            }
+            // Add more levels here following the same structure
+        ];
 
-    <div class="word-item">
-        <p>b <span class="dropzone" data-correct="u"></span> s</p>
-        <img src="imgs/bus.jpg" alt="Image of a Bus">
-    </div>
+        let totalScore = 0; // Keep track of score across levels
+        let correctAnswersInLevel = 0;
+        let draggedItem = null; // Variable to store the element being dragged
 
-    <div class="word-item">
-        <p>p <span class="dropzone" data-correct="i"></span> t</p>
-        <img src="imgs/pit.jpg" alt="Image of a Pit">
-    </div>
-</div>
+        const draggablesContainer = document.querySelector('.draggable-pool');
+        const wordListContainer = document.querySelector('.word-list');
+        const resetButton = document.getElementById('reset-button');
+        const scoreContainer = document.getElementById('score-container');
+        const levelCompleteOverlay = document.getElementById('level-complete-overlay');
+        const nextLevelButton = document.getElementById('next-level-button');
+        const levelDisplay = document.getElementById('level-display');
+        const levelCompleteMessage = document.getElementById('level-complete-message');
 
-<button id="reset-button">Try Again!</button>
+        // --- Core Functions ---
 
+        function loadLevel(levelIndex) {
+            // Basic check if level exists
+            if (levelIndex < 0 || levelIndex >= levels.length) {
+                console.error("Invalid level index:", levelIndex);
+                // Optionally display a "Game Over" message or loop back
+                displayGameOver();
+                return;
+            }
 
-<script>
-// JavaScript for Simple Drag and Drop Spelling
+            currentLevelIndex = levelIndex;
+            const levelData = levels[currentLevelIndex];
+            levelDisplay.textContent = currentLevelIndex + 1; // Display level number (1-based)
+            correctAnswersInLevel = 0; // Reset correct answers for the new level
+            wordListContainer.innerHTML = ''; // Clear previous words
+            draggablesContainer.innerHTML = ''; // Clear previous draggables
+            updateScoreDisplay(); // Update score display (might carry over)
 
-const draggables = document.querySelectorAll('.draggable-pool .draggable'); // Select draggables from the pool
-const dropzones = document.querySelectorAll('.word-list .dropzone'); // Select dropzones in the word list
-const resetButton = document.getElementById('reset-button');
+            // Load draggables for the current level
+            levelData.draggables.forEach(itemText => {
+                const draggable = document.createElement('div');
+                draggable.classList.add('draggable');
+                draggable.setAttribute('draggable', 'true');
+                draggable.textContent = itemText;
+                draggablesContainer.appendChild(draggable);
+                addDraggableListeners(draggable); // Attach listeners immediately
+            });
 
-// --- Drag and Drop Logic ---
-draggables.forEach(draggable => {
-    draggable.addEventListener('dragstart', (e) => {
-        // Store the ID or text of the dragged element
-        e.dataTransfer.setData('text/plain', e.target.textContent.trim());
-        e.target.classList.add('dragging');
-        // Use a timeout to allow the drag image to be created before hiding
-        setTimeout(() => {
-            e.target.style.visibility = 'hidden';
-        }, 0);
-    });
+            // Load words for the current level
+            levelData.words.forEach(wordData => {
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
 
-    draggable.addEventListener('dragend', (e) => {
-         // Make all draggables in the pool visible again if they haven't been dropped
-         // Or if using display: none, this might not be needed
-        e.target.classList.remove('dragging');
-         // If display was set to none on drop, ensure it stays hidden
-         if (e.target.parentElement && e.target.parentElement.classList.contains('draggable-pool')) {
-             e.target.style.visibility = 'visible'; // Show if dragged back to pool area or not dropped
+                const paragraph = document.createElement('p');
+                // Construct the word with a dropzone
+                paragraph.innerHTML = `${wordData.wordParts[0]}<span class="dropzone" data-correct="${wordData.correct}"></span>${wordData.wordParts[1]}`;
+
+                const image = document.createElement('img');
+                image.src = wordData.image;
+                image.alt = wordData.alt;
+
+                wordItem.appendChild(paragraph);
+                wordItem.appendChild(image);
+                wordListContainer.appendChild(wordItem);
+
+                // Find the newly created dropzone within this wordItem and add listeners
+                const dropzone = wordItem.querySelector('.dropzone');
+                 if (dropzone) { // Ensure dropzone was found
+                    addDropzoneListeners(dropzone);
+                 } else {
+                    console.error("Could not find dropzone for word:", wordData);
+                 }
+            });
+
+             levelCompleteOverlay.style.display = 'none'; // Ensure overlay is hidden
+        }
+
+        function updateScoreDisplay() {
+            scoreContainer.textContent = `Score: ${totalScore}`;
+        }
+
+        function checkLevelComplete() {
+            const totalWordsInLevel = levels[currentLevelIndex].words.length;
+            if (correctAnswersInLevel === totalWordsInLevel) {
+                // --- Level Complete! ---
+                levelCompleteMessage.textContent = `🎉 Level ${currentLevelIndex + 1} Complete! 🎉`;
+                levelCompleteOverlay.style.display = 'flex'; // Show the overlay
+
+                // Check if this is the last level
+                if (currentLevelIndex >= levels.length - 1) {
+                    nextLevelButton.textContent = "Play Again?";
+                } else {
+                    nextLevelButton.textContent = "Next Level";
+                }
+            }
+        }
+
+         function displayGameOver() {
+            levelCompleteMessage.innerHTML = `✨ You Finished All Levels! <br> Great Job! ✨`; // Using innerHTML for line break
+            nextLevelButton.textContent = "Play Again?";
+            levelCompleteOverlay.style.display = 'flex'; // Show the overlay
+            // Ensure the index loops back correctly when "Play Again?" is clicked
+            currentLevelIndex = levels.length; // Set index beyond the last level to trigger reset on next click
          }
-    });
-});
 
-dropzones.forEach(dropzone => {
-    dropzone.addEventListener('dragover', e => {
-        e.preventDefault(); // Allow drop
-        dropzone.classList.add('draggingover');
-    });
 
-    dropzone.addEventListener('dragleave', () => {
-        dropzone.classList.remove('draggingover');
-    });
+        // --- Event Handling ---
 
-    dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.classList.remove('draggingover');
+        function addDraggableListeners(draggable) {
+            draggable.addEventListener('dragstart', (e) => {
+                draggedItem = draggable; // Store the element itself
+                e.dataTransfer.setData('text/plain', draggable.textContent);
+                e.dataTransfer.effectAllowed = 'move';
+                // Add slight delay for style application
+                setTimeout(() => draggable.classList.add('dragging'), 0);
+            });
 
-        const draggedElement = document.querySelector('.draggable.dragging'); // Get the currently dragged element
-
-        // If the dropzone already has a child, remove it and return the original to the pool
-        if (dropzone.children.length > 0) {
-            const existingItem = dropzone.children[0];
-            const pool = document.querySelector('.draggable-pool');
-
-            // Find the original element in the pool that matches the text of the item being replaced
-            const originalItemInPool = Array.from(draggables).find(drag => drag.textContent.trim() === existingItem.textContent.trim() && drag.style.display === 'none');
-
-            if (originalItemInPool) {
-                 originalItemInPool.style.display = 'inline-flex'; // Make original in pool visible again
-                 originalItemInPool.draggable = true; // Make it draggable again
-                 originalItemInPool.style.cursor = 'grab'; // Restore grab cursor
-                 originalItemInPool.style.visibility = 'visible'; // Ensure visibility
-            }
-             dropzone.removeChild(existingItem); // Remove the old one from the dropzone
-             dropzone.classList.remove('correct', 'incorrect'); // Remove old feedback classes
+            draggable.addEventListener('dragend', () => {
+                // Check if draggedItem exists before removing class
+                if(draggedItem) {
+                   draggedItem.classList.remove('dragging');
+                }
+                draggedItem = null; // Clear the reference
+            });
         }
 
+        function addDropzoneListeners(dropzone) {
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault(); // Necessary to allow dropping
+                e.dataTransfer.dropEffect = 'move';
+                dropzone.classList.add('draggingover');
+            });
 
-        if (draggedElement) {
-            // Clone the dragged element for dropping
-            const droppedElement = draggedElement.cloneNode(true);
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('draggingover');
+            });
 
-            // Remove dragging class from the clone
-            droppedElement.classList.remove('dragging');
-             // Ensure clone is visible and has correct display style
-            droppedElement.style.visibility = 'visible';
-            droppedElement.style.display = 'flex'; // Set to flex to center content inside dropzone
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('draggingover');
 
-            // Append the cloned element to the dropzone
-            dropzone.appendChild(droppedElement);
+                // Prevent dropping if already filled or if no item was dragged
+                if (dropzone.children.length > 0 || !draggedItem) return;
 
-            // Hide the original element from the pool
-            draggedElement.style.display = 'none';
+                const droppedLetter = e.dataTransfer.getData('text/plain');
+                const correctAnswer = dropzone.dataset.correct;
 
+                // Create visual representation of the dropped item
+                const droppedItemDisplay = document.createElement('div');
+                droppedItemDisplay.classList.add('dropped-item');
+                droppedItemDisplay.textContent = droppedLetter;
+                dropzone.appendChild(droppedItemDisplay); // Add visual inside dropzone
 
-            // Get the correct answer from the dropzone's data attribute
-            const dropzoneCorrectAnswer = dropzone.dataset.correct;
-            // Get the text content from the dropped element
-            const droppedValue = droppedElement.textContent.trim();
+                // Check Answer
+                if (droppedLetter === correctAnswer) {
+                    dropzone.classList.add('correct');
+                    dropzone.classList.remove('incorrect'); // Remove incorrect if it was there
+                    totalScore++;
+                    correctAnswersInLevel++;
+                    updateScoreDisplay();
+                    // Make the original draggable item visually unavailable (optional)
+                    // draggedItem.style.opacity = '0.3';
+                    // draggedItem.setAttribute('draggable', 'false');
+                    // Note: Re-enabling on reset would be needed if doing this
 
-            // Check if the dropped value is correct
-            if (droppedValue === dropzoneCorrectAnswer) {
-                dropzone.classList.add('correct');
-                dropzone.classList.remove('incorrect');
+                    checkLevelComplete(); // Check if level is finished
+                } else {
+                    dropzone.classList.add('incorrect');
+                    // Remove the incorrect visual feedback and the wrongly dropped item after a delay
+                    setTimeout(() => {
+                        dropzone.classList.remove('incorrect');
+                        dropzone.removeChild(droppedItemDisplay); // Remove the incorrect letter display
+                    }, 800); // Keep feedback visible for a bit longer
+                }
+                draggedItem = null; // Clear reference after drop attempt
+            });
+        }
+
+        // --- Button Listeners ---
+
+        resetButton.addEventListener('click', () => {
+            // Reload the *current* level, potentially resetting score for this level if desired
+            // For now, it just reloads the visuals and keeps the totalScore
+            console.log("Resetting level:", currentLevelIndex);
+             // Simple approach: Deduct points earned in this level before reload
+             // Find how many points were scored in this attempt (more complex logic needed if score isn't just +1 per correct)
+             // Let's just reload the level visuals for simplicity now.
+            loadLevel(currentLevelIndex);
+        });
+
+        nextLevelButton.addEventListener('click', () => {
+            if (nextLevelButton.textContent === "Play Again?") {
+                 totalScore = 0; // Reset score completely
+                 loadLevel(0); // Go back to level 1 (index 0)
             } else {
-                dropzone.classList.add('incorrect');
-                dropzone.classList.remove('correct');
+                 loadLevel(currentLevelIndex + 1); // Load the next level
             }
 
-            // Disable dragging and pointer events for the dropped element clone
-            droppedElement.draggable = false;
-            droppedElement.style.cursor = 'default';
-            droppedElement.style.pointerEvents = 'none'; // Prevent clicking/dragging the dropped item
-        }
+            levelCompleteOverlay.style.display = 'none'; // Hide overlay
+        });
 
-         // Ensure the original dragged element (if it wasn't successfully dropped) is visible.
-         // This might happen if dropped outside a valid zone or logic error.
-         // The dragend listener handles most cases, but a check here can be a fallback.
-         const allDraggables = document.querySelectorAll('.draggable-pool .draggable');
-         allDraggables.forEach(drag => {
-              if (drag.classList.contains('dragging') && drag.style.visibility === 'hidden') {
-                  drag.style.visibility = 'visible';
-                  drag.classList.remove('dragging'); // Clear dragging class
-              }
-         });
-    });
-});
 
-// --- Reset Logic ---
-resetButton.addEventListener('click', resetQuiz);
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+             loadLevel(currentLevelIndex); // Load the first level (index 0)
+        });
 
-function resetQuiz() {
-    // Clear all dropzones and return items to pool
-    dropzones.forEach(dropzone => {
-        if (dropzone.children.length > 0) {
-             const existingItem = dropzone.children[0];
-             const pool = document.querySelector('.draggable-pool');
-
-            // Find the original element in the pool
-             const originalItemInPool = Array.from(draggables).find(drag => drag.textContent.trim() === existingItem.textContent.trim());
-
-             if (originalItemInPool) {
-                originalItemInPool.style.display = 'inline-flex'; // Restore display
-                originalItemInPool.style.visibility = 'visible'; // Ensure visibility
-                originalItemInPool.draggable = true;
-                originalItemInPool.style.cursor = 'grab';
-             }
-
-            dropzone.removeChild(existingItem); // Remove the old one from the dropzone
-        }
-        dropzone.classList.remove('correct', 'incorrect'); // Remove feedback classes
-    });
-
-    // Ensure all original draggables in the pool are visible and draggable
-    draggables.forEach(draggable => {
-        draggable.style.display = 'inline-flex'; // Restore display
-        draggable.style.visibility = 'visible'; // Ensure visibility
-        draggable.draggable = true;
-        draggable.style.cursor = 'grab';
-        draggable.classList.remove('dragging'); // Ensure dragging class is off
-    });
-
-    console.log("Quiz reset.");
-}
-
-</script>
+    </script>
 
 </body>
+
 </html>
