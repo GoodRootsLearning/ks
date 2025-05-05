@@ -467,7 +467,41 @@
         // Assume at least Level 1, 2, 3 data exists as before
         { /* Level 1 */ words: [ { wordParts: ["c ", " w"], correct: "o", image: "imgs/cow.jpg", alt: "Image of a Cow" },{ wordParts: ["c ", " t"], correct: "a", image: "imgs/cat.jpg", alt: "Image of a Cat" },{ wordParts: ["k ", " y"], correct: "e", image: "imgs/Key.jpg", alt: "Image of a Key" },{ wordParts: ["b ", " s"], correct: "u", image: "imgs/bus.jpg", alt: "Image of a Bus" },{ wordParts: ["p ", " t"], correct: "i", image: "imgs/pit.jpg", alt: "Image of a Pit" } ], draggables: ["a", "e", "i", "o", "u"] },
         { /* Level 2 */ words: [ { wordParts: ["f ", " sh"], correct: "i", image: "imgs/fish.jpg", alt: "Image of a Fish" },{ wordParts: ["tr ", ""], correct: "ee", image: "imgs/tree.jpg", alt: "Image of a Tree" },{ wordParts: ["b ", " t"], correct: "oa", image: "imgs/boat.jpg", alt: "Image of a Boat" },{ wordParts: ["s ", " n"], correct: "u", image: "imgs/sun.jpg", alt: "Image of a Sun"},{ wordParts: ["c ", " r"], correct: "a", image: "imgs/car.jpg", alt: "Image of a Car" } ], draggables: ["a", "e", "i", "o", "u", "ee", "oa"] },
-        { /* Level 3 */ words: [ { wordParts: ["sh ", " p"], correct: "ee", image: "imgs/sheep.jpg", alt: "Image of a Sheep" },{ wordParts: ["ch ", " r"], correct: "ai", image: "imgs/chair.jpg", alt: "Image of a Chair" },{ wordParts: ["h ", " se"], correct: "ou", image: "imgs/house.jpg", alt: "Image of a House" },{ wordParts: ["cl ", " d"], correct: "ou", image: "imgs/cloud.jpg", alt: "Image of a Cloud" },{ wordParts: ["m ", " n"], correct: "oo", image: "imgs/moon.jpg", alt: "Image of a Moon" } ], draggables: ["a", "e", "i", "o", "u", "ee", "ai", "ou", "oo"] }
+        { /* Level 3 */ words: [ { wordParts: ["sh ", " p"], correct: "ee", image: "imgs/sheep.jpg", alt: "Image of a Sheep" },{ wordParts: ["ch ", " r"], correct: "ai", image: "imgs/chair.jpg", alt: "Image of a Chair" },{ wordParts: ["h ", " se"], correct: "ou", image: "imgs/house.jpg", alt: "Image of a House" },{ wordParts: ["cl ", " d"], correct: "ou", image: "imgs/cloud.jpg", alt: "Image of a Cloud" },{ wordParts: ["m ", " n"], correct: "oo", image: "imgs/moon.jpg", alt: "Image of a Moon" } ], draggables: ["a", "e", "i", "o", "u", "ee", "ai", "ou", "oo"] },
+ { // Level 4 Data
+                words: [
+                    { wordParts: ["F", "x"], correct: "o", image: "imgs/fox.jpg", alt: "Image of a Fox" },
+                    { wordParts: ["B", "t"], correct: "a", image: "imgs/bat.jpg", alt: "Image of a Bat" },
+                    { wordParts: ["R", "n"], correct: "u", image: "imgs/run.jpg", alt: "Image of someone running" },
+                    { wordParts: ["S", "t"], correct: "i", image: "imgs/sit.jpg", alt: "Image of someone sitting" },
+                    { wordParts: ["D", "n"], correct: "e", image: "imgs/den.jpg", alt: "Image of an animal den" }
+                ],
+                draggables: ["a", "e", "i", "o", "u"] // Standard vowels are sufficient
+            },
+ { // Level 5 Data
+                words: [
+                    { wordParts: ["B", "r"], correct: "ea", image: "imgs/bear.jpg", alt: "Image of a Bear" },
+                    { wordParts: ["C", "re"], correct: "a", image: "imgs/care.jpg", alt: "Image representing care" }, // Using 'a' for a_e sound
+                    { wordParts: ["Sh", "re"], correct: "a", image: "imgs/share.jpg", alt: "Image representing sharing" }, // Using 'a' for a_e sound
+                    { wordParts: ["F", "r"], correct: "ai", image: "imgs/fair.jpg", alt: "Image of a fair/carnival" },
+                    { wordParts: ["D", "r"], correct: "ee", image: "imgs/deer.jpg", alt: "Image of a Deer" }
+                ],
+                // Draggables include standard vowels plus the specific teams needed for this level
+                draggables: ["a", "e", "i", "o", "u", "ea", "ai", "ee"]
+            },
+            { // Level 6 Data
+
+	     words: [
+                    { wordParts: ["W", "re"], correct: "i", image: "imgs/wire.jpg", alt: "Image of a wire" }, // Using 'i' for i_e sound
+                    { wordParts: ["D", "sk"], correct: "e", image: "imgs/desk.jpg", alt: "Image of a desk" },
+                    { wordParts: ["R", "st"], correct: "e", image: "imgs/rest.jpg", alt: "Image of someone resting" },
+                    { wordParts: ["M", "d"], correct: "u", image: "imgs/mud.jpg", alt: "Image of mud" },
+                    { wordParts: ["F", "d"], correct: "oo", image: "imgs/food.jpg", alt: "Image of food" }
+                ],
+                // Draggables include standard vowels plus 'oo' needed for this level
+                draggables: ["a", "e", "i", "o", "u", "oo"]
+            }
+
         // Add data for levels 4-10 here if you want 10 levels
     ];
     let totalScore = 0;
